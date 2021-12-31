@@ -80,3 +80,33 @@ def test_get_most_recent_version_of_lesson(engine):
         assert len(records) == 1
         assert records[0].lesson_id == 1
         assert records[0].id == 3
+
+
+def test_lesson_version_authors(engine):
+    with Session(engine) as session:
+        person_1 = Person(name="Alpha", email="alpha@example.io")
+        session.add(person_1)
+        lesson = Lesson()
+        session.add(lesson)
+        version_1 = LessonVersion(lesson_id=1)
+        session.add(version_1)
+        version_1.authors.append(person_1)
+
+        person_2 = Person(name="Beta", email="beta@example.io")
+        session.add(person_2)
+        version_2 = LessonVersion(lesson_id=1)
+        session.add(version_2)
+        version_2.authors.append(person_1)
+        version_2.authors.append(person_2)
+
+        session.commit()
+
+    with Session(engine) as session:
+        person = session.query(Person).where(Person.id==1).one()
+        assert len(person.lesson_versions) == 2
+        assert {v.id for v in person.lesson_versions} == {1, 2}
+
+        v1 = session.query(LessonVersion).where(LessonVersion.id==1).one()
+        assert len(v1.authors) == 1
+        v2 = session.query(LessonVersion).where(LessonVersion.id==2).one()
+        assert len(v2.authors) == 2
