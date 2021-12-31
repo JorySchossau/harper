@@ -1,6 +1,11 @@
 # Emacs backup files
 *~
+
 # Python bytecode files
 *.pyc
+
 # MacOS preview directories
 .DS_Store
+
+# Node modules
+node_modules
