@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from harper.db import Lesson, LessonVersion, Person
+from harper.db import Lesson, LessonVersion, Person, Term
 
 
 def test_all_tables_initially_empty(engine):
@@ -110,3 +110,20 @@ def test_lesson_version_authors(engine):
         assert len(v1.authors) == 1
         v2 = session.query(LessonVersion).where(LessonVersion.id==2).one()
         assert len(v2.authors) == 2
+
+
+def test_lesson_version_terms(engine):
+    with Session(engine) as session:
+        session.add(Lesson())
+        version = LessonVersion(lesson_id=1)
+        session.add(version)
+        term = Term(language="es", term="ensayo", url="https://wikipedia.org/something")
+        session.add(term)
+        term.lesson_versions.append(version)
+        session.commit()
+
+    with Session(engine) as session:
+        lesson = session.query(Lesson).one()
+        assert len(lesson.versions[0].terms) == 1
+        term = lesson.versions[0].terms[0]
+        assert term.term == "ensayo"

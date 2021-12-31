@@ -7,15 +7,17 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Integer,
+    String,
     Table,
     Text,
+    UniqueConstraint,
     create_engine,
     event,
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 
-from harper.util import HarperExc
+from harper.util import HarperExc, LANG_ID_LEN
 
 
 # <https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys>
@@ -63,6 +65,15 @@ lesson_version_author = Table(
 )
 
 
+# Link lesson versions to terms.
+lesson_version_term = Table(
+    "lesson_version_term",
+    DB.base.metadata,
+    Column("term_id", ForeignKey("term.id"), primary_key=True),
+    Column("lesson_version_id", ForeignKey("lesson_version.id"), primary_key=True),
+)
+
+
 class Lesson(DB.base, StandardFields):
     """Represent a logical lesson."""
 
@@ -80,6 +91,24 @@ class LessonVersion(DB.base, StandardFields):
     lesson = relationship("Lesson", back_populates="versions")
     authors = relationship(
         "Person", secondary=lesson_version_author, back_populates="lesson_versions"
+    )
+    terms = relationship(
+        "Term", secondary=lesson_version_term, back_populates="lesson_versions"
+    )
+
+
+class Term(DB.base, StandardFields):
+    """Represent a term used as a pre- or post-requisite."""
+
+    __tablename__ = "term"
+    __table_args__ = (
+        UniqueConstraint("language", "term", name="language_term_unique"),
+    )
+    language = Column(String(LANG_ID_LEN), nullable=False)
+    term = Column(Text, nullable=False)
+    url = Column(Text, nullable=False)
+    lesson_versions = relationship(
+        "LessonVersion", secondary=lesson_version_term, back_populates="terms"
     )
 
 
