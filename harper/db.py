@@ -1,9 +1,18 @@
 """Harper database interface."""
 
-from sqlalchemy import Column, ForeignKey, Integer, Text, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, Text, create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 
 from harper.util import HarperExc
+
+
+# <https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys>
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
 
 class DB:
@@ -31,7 +40,9 @@ class Lesson(DB.base):
 
     __tablename__ = "lesson"
     id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
-    versions = relationship("LessonVersion")
+    versions = relationship(
+        "LessonVersion", back_populates="lesson", cascade="all, delete"
+    )
 
 
 class LessonVersion(DB.base):
@@ -40,6 +51,7 @@ class LessonVersion(DB.base):
     __tablename__ = "lessonversion"
     id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
     lesson_id = Column(Integer, ForeignKey("lesson.id"))
+    lesson = relationship("Lesson", back_populates="versions")
 
 
 class Person(DB.base):
