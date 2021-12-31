@@ -1,19 +1,46 @@
 # Contributing
 
 Harper is written in Python 3 and JavaScript ES8.
-Its tech stack includes:
+
+## Server
+
+The server is built with:
 
 -   [SQLAlchemy][sqlalchemy] for persistence
 -   [FastAPI][fastapi] to implement a REST API
--   [pytest][pytest] for back-end testing
--   [React][react] for its front end
+
+We also use:
+
+-   [Black][black], [Flake8][flake8], [isort][isort], and [pycodestyle][pycodestyle]
+    to check our Python
+-   [pytest][pytest] to test the server
+
+## Interface
+
+The interface is built with:
+
+-   [React][react] for web pages
 -   [Nx][nx] for managing JavaScript components
--   [Cypress][cypress] for front-end testing
+
+We also use:
+
+-   [Cypress][cypress] to test the interface
+
+## Support
+
+We use:
+
+-   [GNU Make][make] as a general-purpose task runner
 -   [Sphinx][sphinx] for user and developer documentation
 
+[black]: https://black.readthedocs.io/
 [cypress]: https://www.cypress.io/
 [fastapi]: https://fastapi.tiangolo.com/
+[flake8]: https://flake8.pycqa.org/
+[isort]: https://pycqa.github.io/
+[make]: https://www.gnu.org/software/make/
 [nx]: https://nx.dev/
+[pycodestyle]: https://pycodestyle.pycqa.org/
 [pytest]: https://docs.pytest.org/
 [react]: https://reactjs.org/
 [sphinx]: https://www.sphinx-doc.org/
