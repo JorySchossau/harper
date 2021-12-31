@@ -17,7 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 
-from harper.util import HarperExc, LANG_ID_LEN
+from harper.util import LANG_ID_LEN, HarperExc
 
 
 # <https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys>

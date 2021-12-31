@@ -6,6 +6,11 @@
 help:
 	@grep -h -E '^##' ${MAKEFILE_LIST} | sed -e 's/## //g' | column -t -s ':'
 
+## serve: run server
+.PHONY: serve
+serve:
+	@python -m harper.main
+
 ## test: run unit tests
 .PHONY: test
 test:

@@ -1,3 +1,5 @@
+"""Test database operations."""
+
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -102,13 +104,13 @@ def test_lesson_version_authors(engine):
         session.commit()
 
     with Session(engine) as session:
-        person = session.query(Person).where(Person.id==1).one()
+        person = session.query(Person).where(Person.id == 1).one()
         assert len(person.lesson_versions) == 2
         assert {v.id for v in person.lesson_versions} == {1, 2}
 
-        v1 = session.query(LessonVersion).where(LessonVersion.id==1).one()
+        v1 = session.query(LessonVersion).where(LessonVersion.id == 1).one()
         assert len(v1.authors) == 1
-        v2 = session.query(LessonVersion).where(LessonVersion.id==2).one()
+        v2 = session.query(LessonVersion).where(LessonVersion.id == 2).one()
         assert len(v2.authors) == 2
 
 

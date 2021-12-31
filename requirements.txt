@@ -5,3 +5,4 @@ isort>=5.10
 pydocstyle>=6.1
 sphinx>=4.3
 sqlalchemy>=1.4
+uvicorn>=0.16
