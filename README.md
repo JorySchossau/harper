@@ -50,6 +50,7 @@ we use the name `harper.yml` because some systems use `lesson.yml` for the actua
 
 ```
 schema: "harper-lite 0.1"
+language: xy
 title: "The Title of the Lesson"
 url: https://where.to.find/lesson
 abstract: >
@@ -83,6 +84,8 @@ notes: >
 **Notes:**
 
 -   The `schema` field identifies this as Harper-Lite Version 0.1.
+
+-   The `language` field should be an [ISO 639-1 language code][iso-lang].
 
 -   The `title` and `abstract` fields are self-explanatory.
 
@@ -129,6 +132,7 @@ An example of a Harper file is shown below:
 
 ```
 schema: "harper-lite 0.1"
+language: en
 title: "Tests of Univariate Normality"
 abstract: >
   How can we tell if univariate data is normally distributed?
@@ -267,6 +271,7 @@ not a repository.
 [folksonomy]: https://en.wikipedia.org/wiki/Folksonomy
 [harper]: https://github.com/gvwilson/harper
 [harper-william]: https://en.wikipedia.org/wiki/William_Rainey_Harper
+[iso-lang]: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 [oer-landmines]: http://third-bit.com/2018/12/02/oer-landmines.html
 [smart]: https://ii.library.jhu.edu/2016/07/20/writing-effective-learning-objectives/
 [stack]: http://stackoverflow.com
