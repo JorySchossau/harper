@@ -31,7 +31,7 @@ def test_create_person(engine):
 
 def test_create_lesson(engine):
     with Session(engine) as session:
-        session.add(Lesson())
+        session.add(Lesson(language="en"))
         session.add(DB.build_lesson_version(session, lesson_id=1))
         session.add(DB.build_lesson_version(session, lesson_id=1))
         session.commit()
@@ -47,10 +47,10 @@ def test_create_lesson(engine):
 
 def test_different_lessons_have_different_sequence_ids(engine):
     with Session(engine) as session:
-        lesson_1 = Lesson()
+        lesson_1 = Lesson(language="en")
         session.add(lesson_1)
         session.add(DB.build_lesson_version(session, lesson_id=1))
-        lesson_2 = Lesson()
+        lesson_2 = Lesson(language="en")
         session.add(lesson_2)
         session.add(DB.build_lesson_version(session, lesson_id=2))
         session.commit()
@@ -63,7 +63,7 @@ def test_different_lessons_have_different_sequence_ids(engine):
 
 def test_deleting_lesson_deletes_versions(engine):
     with Session(engine) as session:
-        session.add(Lesson())
+        session.add(Lesson(language="en"))
         session.add(DB.build_lesson_version(session, lesson_id=1))
         session.commit()
 
@@ -81,7 +81,7 @@ def test_deleting_lesson_deletes_versions(engine):
 def test_get_most_recent_version_of_lesson(engine):
     lesson_id = None
     with Session(engine) as session:
-        lesson = Lesson()
+        lesson = Lesson(language="en")
         session.add(lesson)
         for i in range(3):
             session.add(DB.build_lesson_version(session, lesson_id=1))
@@ -107,7 +107,7 @@ def test_lesson_version_authors(engine):
     with Session(engine) as session:
         person_1 = Person(name="Alpha", email="alpha@example.io")
         session.add(person_1)
-        lesson = Lesson()
+        lesson = Lesson(language="en")
         session.add(lesson)
         version_1 = DB.build_lesson_version(session, lesson_id=1)
         session.add(version_1)
@@ -135,7 +135,7 @@ def test_lesson_version_authors(engine):
 
 def test_lesson_version_terms(engine):
     with Session(engine) as session:
-        session.add(Lesson())
+        session.add(Lesson(language="en"))
         version = DB.build_lesson_version(session, lesson_id=1)
         session.add(version)
         term = Term(language="es", term="ensayo", url="https://wikipedia.org/something")

@@ -110,6 +110,7 @@ class Lesson(DB.base, StandardFields):
     """Represent a logical lesson."""
 
     __tablename__ = "lesson"
+    language = Column(String(LANG_ID_LEN), nullable=False)
     versions = relationship(
         "LessonVersion", back_populates="lesson", cascade="all, delete"
     )
