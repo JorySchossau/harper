@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from harper.db import DB, Lesson, LessonVersion
+from harper.db import DB
 from harper.util import ErrorMessage
 
 from .util import error_match
@@ -56,27 +56,36 @@ def test_get_lesson_when_two_versions(engine, client, stats_2):
 
 
 def test_get_specific_lesson_version(engine, client, stats_2):
+    response = client.get(f"/lesson/{stats_2.id}", params={"sequence_id": 1})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["lesson_id"] == stats_2.id
+    assert body["sequence_id"] == 1
+    assert len(body["authors"]) == 1
+
+
+def test_get_all_lessons(engine, client, coding_1, stats_2):
     with Session(engine) as session:
-        response = client.get(f"/lesson/{stats_2.id}", params={"sequence_id": 1})
-        assert response.status_code == 200
-        body = response.json()
-        assert body["lesson_id"] == stats_2.id
-        assert body["sequence_id"] == 1
-        assert len(body["authors"]) == 1
+        check_coding_1 = DB.get_current_lesson_version(session, coding_1.id)
+        check_stats_2 = DB.get_current_lesson_version(session, stats_2.id)
+        expected_titles = {check_coding_1.title, check_stats_2.title}
+    response = client.get("/lessons")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 2
+    assert {r["title"] for r in body} == expected_titles
 
 
 def test_get_existing_person(engine, client, alpha):
-    with Session(engine) as session:
-        response = client.get(f"/person/{alpha.id}")
-        assert response.status_code == 200
-        body = response.json()
-        assert body["name"] == alpha.name
-        assert body["email"] == alpha.email
+    response = client.get(f"/person/{alpha.id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["name"] == alpha.name
+    assert body["email"] == alpha.email
 
 
 def test_get_nonexistent_person(engine, client):
-    with Session(engine) as session:
-        response = client.get(f"/person/1")
-        assert response.status_code == 404
-        body = response.json()
-        assert error_match(response.json()["detail"], ErrorMessage.no_such_person)
+    response = client.get("/person/1")
+    assert response.status_code == 404
+    body = response.json()
+    assert error_match(body["detail"], ErrorMessage.no_such_person)

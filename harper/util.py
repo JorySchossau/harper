@@ -15,6 +15,7 @@ class HarperExc(Exception):
     """Harper-specific exceptions."""
 
     def __init__(self, message, code=None):
+        """Construct exception with optional HTTP status code."""
         self.message = message
         self.code = code
 
@@ -25,4 +26,5 @@ def author_list(authors):
 
 
 def term_list(terms):
+    """Convert list of term DB objects to JSON."""
     return [{"term": t.term, "url": t.url} for t in terms]

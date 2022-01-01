@@ -1,11 +1,8 @@
 """Test database operations."""
 
-from datetime import datetime
-
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from harper.db import DB, Lesson, LessonVersion, Person, Term
+from harper.db import DB, Lesson, LessonVersion, Person
 
 
 def test_all_tables_initially_empty(engine):
@@ -33,7 +30,7 @@ def test_create_lesson(engine, stats_2):
         assert {1, 2} == {v.sequence_id for v in versions}
 
 
-def test_different_lessons_have_different_sequence_ids(engine, coding_1, stats_2):
+def test_different_lessons_separate_sequence_ids(engine, coding_1, stats_2):
     with Session(engine) as session:
         versions = session.query(LessonVersion).all()
         assert len(versions) == 3
