@@ -3,8 +3,8 @@
 from datetime import datetime
 
 from sqlalchemy import (
-    TIMESTAMP,
     Column,
+    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -13,11 +13,17 @@ from sqlalchemy import (
     UniqueConstraint,
     create_engine,
     event,
+    func,
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 
 from harper.util import LANG_ID_LEN, HarperExc
+
+
+def timestamp():
+    """Return current time."""
+    return datetime.utcnow()
 
 
 # <https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys>
@@ -48,12 +54,27 @@ class DB:
         else:
             raise HarperExc(f"Unknown database back-end '{name}'")
 
+    @staticmethod
+    def get_current_lesson_version(session, lesson_id):
+        """Get the latest version of a lesson if one exists, or None."""
+        subquery = (
+            session.query(func.max(LessonVersion.id))
+            .filter(LessonVersion.lesson_id == lesson_id)
+            .scalar_subquery()
+        )
+        query = session.query(LessonVersion).filter(
+            LessonVersion.lesson_id == lesson_id, LessonVersion.id == subquery
+        )
+        records = query.all()
+        assert len(records) <= 1
+        return records[0] if (len(records) == 1) else None
+
 
 class StandardFields:
     """Common definitions for all tables."""
 
     id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=timestamp)
 
 
 # Link lesson versions to authors.
