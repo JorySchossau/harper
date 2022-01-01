@@ -22,6 +22,12 @@ def test_get_no_lessons_when_database_empty(engine, client):
     assert error_match(response.json()["detail"], ErrorMessage.no_such_lesson)
 
 
+def test_get_nonexistent_lesson(engine, client, alpha):
+    other_id = alpha.id + 1
+    response = client.get(f"/lesson/{other_id}")
+    assert error_match(response.json()["detail"], ErrorMessage.no_such_lesson)
+
+
 def test_get_lesson_when_one_version(engine, client, coding_1):
     with Session(engine) as session:
         retrieved = DB.get_current_lesson_version(session, coding_1.id)
@@ -57,3 +63,20 @@ def test_get_specific_lesson_version(engine, client, stats_2):
         assert body["lesson_id"] == stats_2.id
         assert body["sequence_id"] == 1
         assert len(body["authors"]) == 1
+
+
+def test_get_existing_person(engine, client, alpha):
+    with Session(engine) as session:
+        response = client.get(f"/person/{alpha.id}")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["name"] == alpha.name
+        assert body["email"] == alpha.email
+
+
+def test_get_nonexistent_person(engine, client):
+    with Session(engine) as session:
+        response = client.get(f"/person/1")
+        assert response.status_code == 404
+        body = response.json()
+        assert error_match(response.json()["detail"], ErrorMessage.no_such_person)

@@ -8,6 +8,7 @@ class ErrorMessage:
 
     no_such_lesson = "No such lesson: %{lesson_id}s"
     no_such_lesson_version = "No such lesson: %{lesson_id}s %{sequence_id}s"
+    no_such_person = "No such person: %{person_id}s"
 
 
 class HarperExc(Exception):

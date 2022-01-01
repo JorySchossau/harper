@@ -37,7 +37,9 @@ def test_different_lessons_have_different_sequence_ids(engine, coding_1, stats_2
     with Session(engine) as session:
         versions = session.query(LessonVersion).all()
         assert len(versions) == 3
-        assert {(1, 1), (2, 1), (2, 2)} == {(v.lesson_id, v.sequence_id) for v in versions}
+        assert {(1, 1), (2, 1), (2, 2)} == {
+            (v.lesson_id, v.sequence_id) for v in versions
+        }
 
 
 def test_deleting_lesson_deletes_versions(engine, coding_1, stats_2):
@@ -60,7 +62,11 @@ def test_lesson_version_authors(engine, alpha, beta, stats_2):
         assert len(person.lesson_versions) == 2
         assert {v.sequence_id for v in person.lesson_versions} == {1, 2}
 
-        versions = session.query(LessonVersion).where(LessonVersion.lesson_id == stats_2.id).order_by(LessonVersion.sequence_id)
+        versions = (
+            session.query(LessonVersion)
+            .where(LessonVersion.lesson_id == stats_2.id)
+            .order_by(LessonVersion.sequence_id)
+        )
         assert len(versions[0].authors) == 1
         assert len(versions[1].authors) == 2
 

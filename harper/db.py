@@ -58,7 +58,7 @@ class DB:
 
     @staticmethod
     def get_current_lesson_version(session, lesson_id):
-        """Get the latest version of a lesson if one exists, or None."""
+        """Get the latest version."""
         subquery = (
             session.query(func.max(LessonVersion.id))
             .filter(LessonVersion.lesson_id == lesson_id)
@@ -67,9 +67,7 @@ class DB:
         query = session.query(LessonVersion).filter(
             LessonVersion.lesson_id == lesson_id, LessonVersion.id == subquery
         )
-        records = query.all()
-        assert len(records) <= 1
-        return records[0] if (len(records) == 1) else None
+        return query.one()
 
     @staticmethod
     def build_lesson_version(session, **kwargs):

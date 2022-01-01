@@ -9,7 +9,7 @@ help:
 ## serve: run server
 .PHONY: serve
 serve:
-	@python -m harper.main
+	@python -m harper.server
 
 ## test: run unit tests
 .PHONY: test
