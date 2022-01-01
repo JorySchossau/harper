@@ -22,18 +22,14 @@ def test_get_no_lessons_when_database_empty(engine, client):
     assert error_match(response.json()["detail"], ErrorMessage.no_such_lesson)
 
 
-def test_get_lesson_when_database_has_one(engine, client):
+def test_get_lesson_when_database_has_one(engine, client, lesson_coding_1):
     with Session(engine) as session:
-        session.add(Lesson(language="en"))
-        version = DB.build_lesson_version(session, lesson_id=1)
-        session.add(version)
-        session.commit()
-        created_at = version.created_at
-
+        retrieved = session.query(Lesson).where(Lesson.id == lesson_coding_1.id).one()
+        created_at = retrieved.versions[0].created_at
     response = client.get("/lesson/1")
     assert response.status_code == 200
     body = response.json()
     assert body["id"] == 1
     assert body["authors"] == []
-    assert body["terms"] == []
+    assert len(body["terms"]) == 1
     assert datetime.fromisoformat(body["created_at"]) == created_at

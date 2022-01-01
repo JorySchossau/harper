@@ -23,7 +23,9 @@ from harper.util import LANG_ID_LEN, HarperExc
 
 def timestamp():
     """Return current time."""
-    return datetime.utcnow()
+    result = datetime.utcnow()
+    print(f"TIMESTAMP RESULT {result}")
+    return result
 
 
 # <https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys>
@@ -122,6 +124,11 @@ class LessonVersion(DB.base, StandardFields):
     __tablename__ = "lesson_version"
     lesson_id = Column(Integer, ForeignKey("lesson.id"))
     sequence_id = Column(Integer, nullable=False)
+    title = Column(Text, nullable=False)
+    url = Column(Text, nullable=False)
+    abstract = Column(Text, nullable=False)
+    version = Column(Text, nullable=False)
+    license = Column(Text, nullable=False)
     lesson = relationship("Lesson", back_populates="versions")
     authors = relationship(
         "Person", secondary=lesson_version_author, back_populates="lesson_versions"
