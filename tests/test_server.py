@@ -39,7 +39,7 @@ def test_get_lesson_when_one_version(engine, client, coding_1):
         assert body["lesson_id"] == retrieved.lesson_id
         assert body["sequence_id"] == retrieved.sequence_id
         assert len(body["authors"]) == 1
-        assert len(body["terms"]) == 1
+        assert len(body["terms"]) == 2
         assert datetime.fromisoformat(body["created_at"]) == created_at
 
 
@@ -89,3 +89,10 @@ def test_get_nonexistent_person(engine, client):
     assert response.status_code == 404
     body = response.json()
     assert error_match(body["detail"], ErrorMessage.no_such_person)
+
+
+def test_get_all_terms(engine, client, coding_1, stats_2):
+    response = client.get("/terms")
+    assert response.status_code == 200
+    body = response.json()
+    assert body == [{"term": "studying", "count": 1}, {"term": "musing", "count": 2}]

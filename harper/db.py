@@ -101,8 +101,13 @@ lesson_version_author = Table(
 lesson_version_term = Table(
     "lesson_version_term",
     DB.base.metadata,
-    Column("term_id", ForeignKey("term.id"), primary_key=True),
-    Column("lesson_version_id", ForeignKey("lesson_version.id"), primary_key=True),
+    Column("term_id", ForeignKey("term.id"), nullable=False, primary_key=True),
+    Column(
+        "lesson_version_id",
+        ForeignKey("lesson_version.id"),
+        nullable=False,
+        primary_key=True,
+    ),
 )
 
 
@@ -129,10 +134,10 @@ class LessonVersion(DB.base, StandardFields):
     license = Column(Text, nullable=False)
     lesson = relationship("Lesson", back_populates="versions")
     authors = relationship(
-        "Person", secondary=lesson_version_author, back_populates="lesson_versions"
+        "Person", secondary="lesson_version_author", back_populates="lesson_versions"
     )
     terms = relationship(
-        "Term", secondary=lesson_version_term, back_populates="lesson_versions"
+        "Term", secondary="lesson_version_term", back_populates="lesson_versions"
     )
 
 
@@ -147,7 +152,7 @@ class Term(DB.base, StandardFields):
     term = Column(Text, nullable=False)
     url = Column(Text, nullable=False)
     lesson_versions = relationship(
-        "LessonVersion", secondary=lesson_version_term, back_populates="terms"
+        "LessonVersion", secondary="lesson_version_term", back_populates="terms"
     )
 
 
@@ -158,5 +163,5 @@ class Person(DB.base, StandardFields):
     name = Column(Text, nullable=False)
     email = Column(Text, nullable=False)
     lesson_versions = relationship(
-        "LessonVersion", secondary=lesson_version_author, back_populates="authors"
+        "LessonVersion", secondary="lesson_version_author", back_populates="authors"
     )

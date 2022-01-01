@@ -53,8 +53,38 @@ def beta(engine, tuesday):
 
 
 @pytest.fixture
-def coding_1(engine, alpha, monday, tuesday):
+def studying(engine, monday):
     with Session(engine, expire_on_commit=False) as session:
+        term = Term(
+            language="en",
+            term="studying",
+            url="https://wikipedia.org/studying",
+            created_at=monday,
+        )
+        session.add(term)
+        session.commit()
+        return term
+
+
+@pytest.fixture
+def musing(engine, monday):
+    with Session(engine, expire_on_commit=False) as session:
+        term = Term(
+            language="en",
+            term="musing",
+            url="https://wikipedia.org/musing",
+            created_at=monday,
+        )
+        session.add(term)
+        session.commit()
+        return term
+
+
+@pytest.fixture
+def coding_1(engine, alpha, studying, musing, monday, tuesday):
+    with Session(engine, expire_on_commit=False) as session:
+        studying = session.query(Term).filter(Term.id == studying.id).one()
+        musing = session.query(Term).filter(Term.id == musing.id).one()
         lesson = Lesson(language="en", created_at=tuesday)
         session.add(lesson)
         session.commit()  # to set lesson.id
@@ -70,24 +100,20 @@ def coding_1(engine, alpha, monday, tuesday):
         )
         version.authors.append(alpha)
         session.add(version)
-        term = Term(
-            language="en",
-            term="studying",
-            url="https://wikipedia.org/studying",
-            created_at=monday,
-        )
-        session.add(term)
-        term.lesson_versions.append(version)
+        studying.lesson_versions.append(version)
+        musing.lesson_versions.append(version)
         session.commit()
         return lesson
 
 
 @pytest.fixture
-def stats_2(engine, alpha, beta, tuesday, friday):
+def stats_2(engine, alpha, beta, musing, tuesday, friday):
     with Session(engine, expire_on_commit=False) as session:
         lesson = Lesson(language="en", created_at=tuesday)
+        musing = session.query(Term).filter(Term.id == musing.id).one()
         session.add(lesson)
         session.commit()  # to set lesson.id
+
         version_1 = DB.build_lesson_version(
             session,
             lesson_id=lesson.id,
@@ -99,7 +125,9 @@ def stats_2(engine, alpha, beta, tuesday, friday):
             created_at=tuesday,
         )
         version_1.authors.append(alpha)
+        version_1.terms.append(musing)
         session.add(version_1)
+
         version_2 = DB.build_lesson_version(
             session,
             lesson_id=lesson.id,
@@ -112,8 +140,10 @@ def stats_2(engine, alpha, beta, tuesday, friday):
         )
         version_2.authors.append(alpha)
         version_2.authors.append(beta)
+        version_2.terms.append(musing)
         session.add(version_2)
         session.commit()
+
         return lesson
 
 

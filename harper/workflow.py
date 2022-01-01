@@ -4,23 +4,21 @@ from sqlalchemy import and_, func
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
-from harper.db import DB, LessonVersion, Person
+from harper.db import DB, LessonVersion, Person, Term
 from harper.util import ErrorMessage, HarperExc, author_list, term_list
 
 
 def get_all_lessons():
     """Return the most recent versions of all lessons."""
     with Session(DB.engine) as session:
-        subquery = (
-            session.query(func.max(LessonVersion.id))
-            .group_by(LessonVersion.lesson_id)
-            .subquery()
-        )
-        results = (
-            session.query(LessonVersion)
-            .filter(LessonVersion.id.in_(subquery.select()))
-            .all()
-        )
+        subquery = session.query(func.max(LessonVersion.id))
+        subquery = subquery.group_by(LessonVersion.lesson_id)
+        subquery = subquery.subquery()
+
+        query = session.query(LessonVersion)
+        query = query.filter(LessonVersion.id.in_(subquery.select()))
+
+        results = query.all()
         return [
             {"lesson_id": r.lesson_id, "sequence_id": r.sequence_id, "title": r.title}
             for r in results
@@ -74,3 +72,20 @@ def get_person(person_id):
         raise HarperExc(
             ErrorMessage.no_such_person.format(person_id=person_id), code=404
         )
+
+
+def get_all_terms():
+    """Get all terms and a count of how often they're used."""
+    with Session(DB.engine) as session:
+        subquery = session.query(func.max(LessonVersion.id))
+        subquery = subquery.group_by(LessonVersion.lesson_id)
+        subquery = subquery.subquery()
+
+        query = session.query(Term, func.count(Term.id))
+        query = query.select_from(LessonVersion)
+        query = query.join(LessonVersion.terms)
+        query = query.group_by(Term.id)
+        query = query.filter(LessonVersion.id.in_(subquery.select()))
+
+        results = query.all()
+        return [{"term": r[0].term, "count": r[1]} for r in results]

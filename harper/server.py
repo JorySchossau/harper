@@ -42,6 +42,15 @@ async def get_person(person_id):
         raise HTTPException(status_code=exc.code, detail=exc.message)
 
 
+@app.get("/terms")
+async def get_all_terms():
+    """All terms with frequency count."""
+    try:
+        return workflow.get_all_terms()
+    except HarperExc as exc:
+        raise HTTPException(status_code=exc.code, detail=exc.message)
+
+
 # Run from the command line.
 if __name__ == "__main__":
     uvicorn.run("harper.server:app", host="0.0.0.0", port=80, reload=True)

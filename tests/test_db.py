@@ -71,6 +71,7 @@ def test_lesson_version_authors(engine, alpha, beta, stats_2):
 def test_lesson_version_terms(engine, coding_1):
     with Session(engine) as session:
         lesson = session.query(Lesson).one()
-        assert len(lesson.versions[0].terms) == 1
-        term = lesson.versions[0].terms[0]
-        assert term.term == "studying"
+        assert len(lesson.versions) == 1
+        assert len(lesson.versions[0].terms) == 2
+        actual = {t.term for t in lesson.versions[0].terms}
+        assert actual == {"studying", "musing"}
