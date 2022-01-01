@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from harper.db import Lesson, LessonVersion
+from harper.db import DB, Lesson, LessonVersion
 from harper.util import ErrorMessage
 
 from .util import error_match
@@ -25,7 +25,7 @@ def test_get_no_lessons_when_database_empty(engine, client):
 def test_get_lesson_when_database_has_one(engine, client):
     with Session(engine) as session:
         session.add(Lesson())
-        version = LessonVersion(lesson_id=1)
+        version = DB.build_lesson_version(session, lesson_id=1)
         session.add(version)
         session.commit()
         created_at = version.created_at

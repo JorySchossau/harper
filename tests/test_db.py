@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from harper.db import Lesson, LessonVersion, Person, Term
+from harper.db import DB, Lesson, LessonVersion, Person, Term
 
 
 def test_all_tables_initially_empty(engine):
@@ -32,8 +32,8 @@ def test_create_person(engine):
 def test_create_lesson(engine):
     with Session(engine) as session:
         session.add(Lesson())
-        session.add(LessonVersion(lesson_id=1))
-        session.add(LessonVersion(lesson_id=1))
+        session.add(DB.build_lesson_version(session, lesson_id=1))
+        session.add(DB.build_lesson_version(session, lesson_id=1))
         session.commit()
 
     with Session(engine) as session:
@@ -42,12 +42,29 @@ def test_create_lesson(engine):
 
         versions = session.query(LessonVersion).all()
         assert len(versions) == 2
+        assert {1, 2} == {v.sequence_id for v in versions}
+
+
+def test_different_lessons_have_different_sequence_ids(engine):
+    with Session(engine) as session:
+        lesson_1 = Lesson()
+        session.add(lesson_1)
+        session.add(DB.build_lesson_version(session, lesson_id=1))
+        lesson_2 = Lesson()
+        session.add(lesson_2)
+        session.add(DB.build_lesson_version(session, lesson_id=2))
+        session.commit()
+
+    with Session(engine) as session:
+        versions = session.query(LessonVersion).all()
+        assert len(versions) == 2
+        assert {(1, 1), (2, 1)} == {(v.lesson_id, v.sequence_id) for v in versions}
 
 
 def test_deleting_lesson_deletes_versions(engine):
     with Session(engine) as session:
         session.add(Lesson())
-        session.add(LessonVersion(lesson_id=1))
+        session.add(DB.build_lesson_version(session, lesson_id=1))
         session.commit()
 
         assert len(session.query(Lesson).all()) == 1
@@ -67,7 +84,7 @@ def test_get_most_recent_version_of_lesson(engine):
         lesson = Lesson()
         session.add(lesson)
         for i in range(3):
-            session.add(LessonVersion(lesson_id=1))
+            session.add(DB.build_lesson_version(session, lesson_id=1))
         session.commit()
         lesson_id = lesson.id
 
@@ -92,13 +109,13 @@ def test_lesson_version_authors(engine):
         session.add(person_1)
         lesson = Lesson()
         session.add(lesson)
-        version_1 = LessonVersion(lesson_id=1)
+        version_1 = DB.build_lesson_version(session, lesson_id=1)
         session.add(version_1)
         version_1.authors.append(person_1)
 
         person_2 = Person(name="Beta", email="beta@example.io")
         session.add(person_2)
-        version_2 = LessonVersion(lesson_id=1)
+        version_2 = DB.build_lesson_version(session, lesson_id=1)
         session.add(version_2)
         version_2.authors.append(person_1)
         version_2.authors.append(person_2)
@@ -119,7 +136,7 @@ def test_lesson_version_authors(engine):
 def test_lesson_version_terms(engine):
     with Session(engine) as session:
         session.add(Lesson())
-        version = LessonVersion(lesson_id=1)
+        version = DB.build_lesson_version(session, lesson_id=1)
         session.add(version)
         term = Term(language="es", term="ensayo", url="https://wikipedia.org/something")
         session.add(term)

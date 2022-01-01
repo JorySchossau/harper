@@ -69,6 +69,17 @@ class DB:
         assert len(records) <= 1
         return records[0] if (len(records) == 1) else None
 
+    @staticmethod
+    def build_lesson_version(session, **kwargs):
+        """Add next sequence ID value to lession version."""
+        max_sequence_id = (
+            session.query(func.max(LessonVersion.sequence_id))
+            .filter(LessonVersion.lesson_id == kwargs["lesson_id"])
+            .scalar()
+        )
+        sequence_id = 1 if (max_sequence_id is None) else (max_sequence_id + 1)
+        return LessonVersion(sequence_id=sequence_id, **kwargs)
+
 
 class StandardFields:
     """Common definitions for all tables."""
@@ -109,6 +120,7 @@ class LessonVersion(DB.base, StandardFields):
 
     __tablename__ = "lesson_version"
     lesson_id = Column(Integer, ForeignKey("lesson.id"))
+    sequence_id = Column(Integer, nullable=False)
     lesson = relationship("Lesson", back_populates="versions")
     authors = relationship(
         "Person", secondary=lesson_version_author, back_populates="lesson_versions"
