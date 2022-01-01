@@ -34,7 +34,7 @@ def engine():
 
 
 @pytest.fixture
-def person_alpha(engine, monday):
+def alpha(engine, monday):
     with Session(engine, expire_on_commit=False) as session:
         person = Person(name="Alpha", email="alpha@example.io", created_at=monday)
         session.add(person)
@@ -43,7 +43,7 @@ def person_alpha(engine, monday):
 
 
 @pytest.fixture
-def person_beta(engine, tuesday):
+def beta(engine, tuesday):
     with Session(engine, expire_on_commit=False) as session:
         person = Person(name="Beta", email="beta@example.io", created_at=tuesday)
         session.add(person)
@@ -52,7 +52,7 @@ def person_beta(engine, tuesday):
 
 
 @pytest.fixture
-def lesson_coding_1(engine, monday, tuesday):
+def coding_1(engine, alpha, monday, tuesday):
     with Session(engine, expire_on_commit=False) as session:
         lesson = Lesson(language="en", created_at=tuesday)
         session.add(lesson)
@@ -61,6 +61,7 @@ def lesson_coding_1(engine, monday, tuesday):
                                           title="Coding Lesson", url="https://example.io/coding/",
                                           abstract="Coding lesson abstract", license="CC-BY",
                                           version="1.1", created_at=tuesday)
+        version.authors.append(alpha)
         session.add(version)
         term = Term(language="en", term="studying", url="https://wikipedia.org/studying", created_at=monday)
         session.add(term)
@@ -70,19 +71,24 @@ def lesson_coding_1(engine, monday, tuesday):
 
 
 @pytest.fixture
-def lesson_stats_2(engine, tuesday, friday):
+def stats_2(engine, alpha, beta, tuesday, friday):
     with Session(engine, expire_on_commit=False) as session:
         lesson = Lesson(language="en", created_at=tuesday)
         session.add(lesson)
         session.commit() # to set lesson.id
-        session.add(DB.build_lesson_version(session, lesson_id=lesson.id,
+        version_1 = DB.build_lesson_version(session, lesson_id=lesson.id,
                                             title="Stats Lesson", url="https://example.io/stats/",
                                             abstract="Stats lesson abstract", license="CC-BY",
-                                            version="1.0", created_at=tuesday))
-        session.add(DB.build_lesson_version(session, lesson_id=lesson.id,
+                                            version="1.0", created_at=tuesday)
+        version_1.authors.append(alpha)
+        session.add(version_1)
+        version_2 = DB.build_lesson_version(session, lesson_id=lesson.id,
                                             title="Stats Lesson Revised", url="https://example.io/stats/",
                                             abstract="Stats lesson abstract revised", license="CC-BY",
-                                            version="1.1", created_at=friday))
+                                            version="1.1", created_at=friday)
+        version_2.authors.append(alpha)
+        version_2.authors.append(beta)
+        session.add(version_2)
         session.commit()
         return lesson
 

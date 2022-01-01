@@ -6,7 +6,8 @@ LANG_ID_LEN = 2
 class ErrorMessage:
     """Server error messages."""
 
-    no_such_lesson = "No such lesson: '%{lesson_id}s'"
+    no_such_lesson = "No such lesson: %{lesson_id}s"
+    no_such_lesson_version = "No such lesson: %{lesson_id}s %{sequence_id}s"
 
 
 class HarperExc(Exception):
