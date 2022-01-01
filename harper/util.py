@@ -14,7 +14,9 @@ class ErrorMessage:
 class HarperExc(Exception):
     """Harper-specific exceptions."""
 
-    pass
+    def __init__(self, message, code=None):
+        self.message = message
+        self.code = code
 
 
 def author_list(authors):
