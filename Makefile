@@ -16,6 +16,11 @@ serve:
 test:
 	@pytest tests
 
+## docs: build documentation
+.PHONY: docs
+docs:
+	@mkdocs build
+
 ## lint: run software quality checks
 .PHONY: lint
 lint:

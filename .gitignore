@@ -9,3 +9,6 @@
 
 # Node modules
 node_modules
+
+# MkDocs output directory
+site

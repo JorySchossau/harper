@@ -1,0 +1,9 @@
+site_name: "Harper"
+repo_url: https://github.com/gvwilson/harper/
+
+theme:
+  name: "readthedocs"
+
+plugins:
+- search
+- mkdocstrings
