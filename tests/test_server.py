@@ -2,9 +2,6 @@
 
 from datetime import datetime
 
-from sqlalchemy.orm import Session
-
-from harper.db import DB
 from harper.util import ErrorMessage
 
 from .util import dict_list_match, error_match

@@ -1,9 +1,9 @@
 """Harper database interface."""
 
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 from datetime import datetime
 
+from dataclasses_json import dataclass_json
 from sqlalchemy import (
     Column,
     DateTime,
@@ -21,7 +21,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.pool import StaticPool
 
-from harper.util import LANG_ID_LEN, HarperExc, author_list, term_list
+from harper.util import LANG_ID_LEN, HarperExc
 
 
 def timestamp():
@@ -52,9 +52,11 @@ class DB:
     def configure(name):
         """Configure the back end."""
         if name == "sqlite":
-            DB.engine = create_engine("sqlite://",
-                                      connect_args={"check_same_thread": False},
-                                      poolclass=StaticPool)
+            DB.engine = create_engine(
+                "sqlite://",
+                connect_args={"check_same_thread": False},
+                poolclass=StaticPool,
+            )
             DB.base.metadata.drop_all(DB.engine)
             DB.base.metadata.create_all(DB.engine)
             return DB.engine
@@ -97,9 +99,6 @@ class StandardFields:
     id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=timestamp)
 
-    def as_dict(self):
-        return asdict(self)
-
 
 # Link lesson versions to authors.
 lesson_version_author = Table(
@@ -140,7 +139,6 @@ class Lesson(DB.base, StandardFields):
 @dataclass
 class LessonVersion(DB.base, StandardFields):
     """Represent a specific version of a lesson."""
-
 
     lesson_id: int
     sequence_id: int

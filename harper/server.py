@@ -7,7 +7,6 @@ import harper.lesson
 import harper.person
 import harper.term
 
-
 app = FastAPI()
 
 

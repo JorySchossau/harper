@@ -1,10 +1,11 @@
+"""Handle requests for information about persons."""
+
 from fastapi import APIRouter
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from harper.db import DB, Person
 from harper.util import ErrorMessage, HarperExc, harper_exc
-
 
 router = APIRouter()
 

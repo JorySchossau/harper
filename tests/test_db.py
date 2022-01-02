@@ -28,9 +28,7 @@ def test_create_lesson(session, stats, stats_v2):
 def test_different_lessons_separate_sequence_ids(session, coding_v1, stats_v2):
     versions = session.query(LessonVersion).all()
     assert len(versions) == 3
-    assert {(1, 1), (2, 1), (2, 2)} == {
-        (v.lesson_id, v.sequence_id) for v in versions
-    }
+    assert {(1, 1), (2, 1), (2, 2)} == {(v.lesson_id, v.sequence_id) for v in versions}
 
 
 def test_deleting_lesson_deletes_versions(session, stats, coding_v1, stats_v2):

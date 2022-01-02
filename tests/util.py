@@ -2,8 +2,8 @@
 
 
 def dict_list_match(major, expected, actual):
-    expected = {entry[major]:entry for entry in expected}
-    actual = {entry[major]:entry for entry in actual}
+    expected = {entry[major]: entry for entry in expected}
+    actual = {entry[major]: entry for entry in actual}
     if set(expected.keys()) != set(actual.keys()):
         return False
     for (outer, expected_item) in expected.items():

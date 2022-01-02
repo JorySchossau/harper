@@ -1,9 +1,9 @@
 """Utilities."""
 
+import inspect
 from functools import wraps
 
 from fastapi import HTTPException
-
 
 LANG_ID_LEN = 2
 
@@ -34,6 +34,7 @@ def harper_exc(original):
             return await original(*args, **kwargs)
         except HarperExc as exc:
             raise HTTPException(status_code=exc.code, detail=exc.message)
+
     return wrapped
 
 

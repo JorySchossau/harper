@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+"""Handle requests for information about lessons."""
+
+from fastapi import APIRouter
 from sqlalchemy import and_, func
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from harper.db import DB, LessonVersion
-from harper.util import ErrorMessage, HarperExc, harper_exc, author_list, term_list
-
+from harper.util import ErrorMessage, HarperExc, author_list, harper_exc, term_list
 
 router = APIRouter()
 
@@ -47,7 +48,10 @@ async def get_lesson(lesson_id, sequence_id=None):
                     )
                     .one()
                 )
-            return lv.to_dict() | {"authors": author_list(lv.authors), "terms": term_list(lv.terms)}
+            return lv.to_dict() | {
+                "authors": author_list(lv.authors),
+                "terms": term_list(lv.terms),
+            }
     except NoResultFound:
         raise HarperExc(
             fmt.format(lesson_id=lesson_id, sequence_id=sequence_id), code=404

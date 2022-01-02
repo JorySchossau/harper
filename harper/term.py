@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+"""Handle requests for information about terms."""
+
+from fastapi import APIRouter
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from harper.db import DB, LessonVersion, Term
-from harper.util import HarperExc, harper_exc
-
+from harper.util import harper_exc
 
 router = APIRouter()
 

@@ -1,7 +1,9 @@
 """Test fixture creation."""
 
+
 def test_fixture_client(client):
     pass
+
 
 def test_fixture_monday(monday):
     pass

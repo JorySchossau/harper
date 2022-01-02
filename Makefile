@@ -30,10 +30,10 @@ docs:
 ## lint: run software quality checks
 .PHONY: lint
 lint:
-	@flake8
-	@isort --check .
-	@black --check .
-	@pydocstyle --convention=google --count harper
+	@-flake8
+	@-isort --check .
+	@-black --check .
+	@-pydocstyle --convention=google --count harper
 
 ## reformat: reformat code in place
 .PHONY: reformat
