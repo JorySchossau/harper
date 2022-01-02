@@ -5,6 +5,10 @@ from fastapi import FastAPI, HTTPException
 
 import harper.workflow as workflow
 from harper.util import HarperExc
+import harper.lesson
+import harper.person
+import harper.term
+
 
 app = FastAPI()
 
@@ -15,40 +19,9 @@ async def root():
     return {"message": "Hello Harper"}
 
 
-@app.get("/lessons")
-async def get_all_lessons():
-    """List of most recent versions of all lessons."""
-    try:
-        return workflow.get_all_lessons()
-    except HarperExc as exc:
-        raise HTTPException(status_code=exc.code, detail=exc.message)
-
-
-@app.get("/lesson/{lesson_id}")
-async def get_lesson(lesson_id, sequence_id=None):
-    """A specific (version of a) lesson."""
-    try:
-        return workflow.get_lesson(lesson_id, sequence_id)
-    except HarperExc as exc:
-        raise HTTPException(status_code=exc.code, detail=exc.message)
-
-
-@app.get("/person/{person_id}")
-async def get_person(person_id):
-    """A person."""
-    try:
-        return workflow.get_person(person_id)
-    except HarperExc as exc:
-        raise HTTPException(status_code=exc.code, detail=exc.message)
-
-
-@app.get("/terms")
-async def get_all_terms():
-    """All terms with frequency count."""
-    try:
-        return workflow.get_all_terms()
-    except HarperExc as exc:
-        raise HTTPException(status_code=exc.code, detail=exc.message)
+app.include_router(harper.lesson.router, prefix="/lesson", tags=["Lessons"])
+app.include_router(harper.person.router, prefix="/person", tags=["Persons"])
+app.include_router(harper.term.router, prefix="/term", tags=["Terms"])
 
 
 # Run from the command line.
