@@ -17,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.pool import StaticPool
 
 from harper.util import LANG_ID_LEN, HarperExc
 
@@ -49,7 +50,9 @@ class DB:
     def configure(name):
         """Configure the back end."""
         if name == "sqlite":
-            DB.engine = create_engine("sqlite+pysqlite:///testing.db")
+            DB.engine = create_engine("sqlite://",
+                                      connect_args={"check_same_thread": False},
+                                      poolclass=StaticPool)
             DB.base.metadata.drop_all(DB.engine)
             DB.base.metadata.create_all(DB.engine)
             return DB.engine
