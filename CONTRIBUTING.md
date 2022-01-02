@@ -1,6 +1,6 @@
 # Contributing
 
-Harper is written in Python 3 and JavaScript ES8.
+Harper uses Python 3.9 and JavaScript ES8.
 
 ## Server
 
@@ -20,7 +20,6 @@ We also use:
 The interface is built with:
 
 -   [React][react] for web pages
--   [Nx][nx] for managing JavaScript components
 
 We also use:
 
@@ -31,7 +30,7 @@ We also use:
 We use:
 
 -   [GNU Make][make] as a general-purpose task runner
--   [Sphinx][sphinx] for user and developer documentation
+-   [MkDocs][mkdocs] for documentation
 
 [black]: https://black.readthedocs.io/
 [cypress]: https://www.cypress.io/
@@ -39,9 +38,8 @@ We use:
 [flake8]: https://flake8.pycqa.org/
 [isort]: https://pycqa.github.io/
 [make]: https://www.gnu.org/software/make/
-[nx]: https://nx.dev/
+[mkdocs]: https://www.mkdocs.org/
 [pycodestyle]: https://pycodestyle.pycqa.org/
 [pytest]: https://docs.pytest.org/
 [react]: https://reactjs.org/
-[sphinx]: https://www.sphinx-doc.org/
 [sqlalchemy]: https://www.sqlalchemy.org/
