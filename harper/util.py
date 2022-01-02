@@ -28,3 +28,38 @@ def author_list(authors):
 def term_list(terms):
     """Convert list of term DB objects to JSON."""
     return [{"term": t.term, "url": t.url} for t in terms]
+
+
+def get_db_schema(engine):
+    """Find the tables and columns in the database.
+
+    Args:
+        engine: SQLAlchemy database connection engine.
+
+    Returns:
+        A dict-of-sets with table names as keys and column names as values.
+    """
+    result = {}
+    inspector = inspect(engine)
+    for table_name in inspector.get_table_names():
+        result[table_name] = set()
+        for column in inspector.get_columns(table_name):
+            result[table_name].add(column["name"])
+    return result
+
+
+def get_model_schema(metadata):
+    """Find the tables and columns in the SQLAlchemy model.
+
+    Args:
+        metadata: SQLAlchemy metadata structure.
+
+    Returns:
+        A dict-of-sets with table names as keys and column names as values.
+    """
+    result = {}
+    for table in metadata.sorted_tables:
+        result[table.name] = set()
+        for column in table.columns:
+            result[table.name].add(column.name)
+    return result
