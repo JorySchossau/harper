@@ -50,7 +50,8 @@ class DB:
     def configure(name):
         """Configure the back end."""
         if name == "sqlite":
-            DB.engine = create_engine("sqlite+pysqlite:///:memory:")
+            DB.engine = create_engine("sqlite+pysqlite:///testing.db")
+            DB.base.metadata.drop_all(DB.engine)
             DB.base.metadata.create_all(DB.engine)
             return DB.engine
         else:
