@@ -1,5 +1,7 @@
 """Harper database interface."""
 
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 from datetime import datetime
 
 from sqlalchemy import (
@@ -19,7 +21,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.pool import StaticPool
 
-from harper.util import LANG_ID_LEN, HarperExc
+from harper.util import LANG_ID_LEN, HarperExc, author_list, term_list
 
 
 def timestamp():
@@ -84,11 +86,19 @@ class DB:
         return LessonVersion(sequence_id=sequence_id, **kwargs)
 
 
+@dataclass_json
+@dataclass
 class StandardFields:
     """Common definitions for all tables."""
 
+    id: int
+    created_at: datetime
+
     id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=timestamp)
+
+    def as_dict(self):
+        return asdict(self)
 
 
 # Link lesson versions to authors.
@@ -114,8 +124,11 @@ lesson_version_term = Table(
 )
 
 
+@dataclass
 class Lesson(DB.base, StandardFields):
     """Represent a logical lesson."""
+
+    language: str
 
     __tablename__ = "lesson"
     language = Column(String(LANG_ID_LEN), nullable=False)
@@ -124,8 +137,18 @@ class Lesson(DB.base, StandardFields):
     )
 
 
+@dataclass
 class LessonVersion(DB.base, StandardFields):
     """Represent a specific version of a lesson."""
+
+
+    lesson_id: int
+    sequence_id: int
+    title: str
+    url: str
+    abstract: str
+    version: str
+    license: str
 
     __tablename__ = "lesson_version"
     lesson_id = Column(Integer, ForeignKey("lesson.id"))
@@ -144,8 +167,13 @@ class LessonVersion(DB.base, StandardFields):
     )
 
 
+@dataclass
 class Term(DB.base, StandardFields):
     """Represent a term used as a pre- or post-requisite."""
+
+    language: str
+    term: str
+    url: str
 
     __tablename__ = "term"
     __table_args__ = (
@@ -159,8 +187,12 @@ class Term(DB.base, StandardFields):
     )
 
 
+@dataclass
 class Person(DB.base, StandardFields):
     """Represent a person."""
+
+    name: str
+    email: str
 
     __tablename__ = "person"
     name = Column(Text, nullable=False)

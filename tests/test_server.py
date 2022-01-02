@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from harper.db import DB
 from harper.util import ErrorMessage
 
-from .util import error_match
+from .util import dict_list_match, error_match
 
 
 def test_get_status_message(client, engine):
@@ -93,4 +93,5 @@ def test_get_all_terms(client, coding_v1, stats_v2):
     response = client.get("/term/all/")
     assert response.status_code == 200
     body = response.json()
-    assert body == [{"term": "studying", "count": 1}, {"term": "musing", "count": 2}]
+    expected = [{"term": "studying", "count": 1}, {"term": "musing", "count": 2}]
+    assert dict_list_match("term", expected, body)

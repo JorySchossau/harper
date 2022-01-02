@@ -25,4 +25,4 @@ async def get_all_terms():
         query = query.filter(LessonVersion.id.in_(subquery.select()))
 
         results = query.all()
-        return [{"term": r[0].term, "count": r[1]} for r in results]
+        return [r[0].to_dict() | {"count": r[1]} for r in results]

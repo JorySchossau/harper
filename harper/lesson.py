@@ -23,10 +23,7 @@ async def get_all_lessons():
         query = query.filter(LessonVersion.id.in_(subquery.select()))
 
         results = query.all()
-        return [
-            {"lesson_id": r.lesson_id, "sequence_id": r.sequence_id, "title": r.title}
-            for r in results
-        ]
+        return [r.to_dict() for r in results]
 
 
 @router.get("/{lesson_id}/")
@@ -50,18 +47,7 @@ async def get_lesson(lesson_id, sequence_id=None):
                     )
                     .one()
                 )
-            return {
-                "lesson_id": lv.lesson_id,
-                "sequence_id": lv.sequence_id,
-                "created_at": lv.created_at.isoformat(),
-                "authors": author_list(lv.authors),
-                "terms": term_list(lv.terms),
-                "title": lv.title,
-                "url": lv.url,
-                "version": lv.version,
-                "abstract": lv.abstract,
-                "license": lv.license,
-            }
+            return lv.to_dict() | {"authors": author_list(lv.authors), "terms": term_list(lv.terms)}
     except NoResultFound:
         raise HarperExc(
             fmt.format(lesson_id=lesson_id, sequence_id=sequence_id), code=404

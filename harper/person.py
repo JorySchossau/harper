@@ -15,7 +15,7 @@ async def get_all_persons():
     """List of all people."""
     with Session(DB.engine) as session:
         persons = session.query(Person).all()
-        return [{"person_id": p.id, "name": p.name, "email": p.email} for p in persons]
+        return [p.to_dict() for p in persons]
 
 
 @router.get("/{person_id}/")
@@ -25,7 +25,7 @@ async def get_person(person_id):
     try:
         with Session(DB.engine) as session:
             person = session.query(Person).where(Person.id == person_id).one()
-            return {"person_id": person.id, "name": person.name, "email": person.email}
+            return person.to_dict()
     except NoResultFound:
         raise HarperExc(
             ErrorMessage.no_such_person.format(person_id=person_id), code=404
