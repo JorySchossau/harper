@@ -11,6 +11,12 @@ from harper.server import app
 
 
 @pytest.fixture
+def client():
+    """Create a client for testing the FastAPI server."""
+    return TestClient(app)
+
+
+@pytest.fixture
 def monday():
     """One of several timestamps."""
     return datetime(2021, 12, 6, 1, 1, 1)
@@ -30,124 +36,127 @@ def friday():
 
 @pytest.fixture
 def engine():
-    """Re-initialize the SQLite back-end and return the engine."""
+    """Re-initialize the database."""
     return DB.configure("sqlite")
 
 
 @pytest.fixture
-def alpha(engine, monday):
-    with Session(engine, expire_on_commit=False) as session:
-        person = Person(name="Alpha", email="alpha@example.io", created_at=monday)
-        session.add(person)
-        session.commit()
-        return person
+def session(engine):
+    """Re-initialize the database and get a session."""
+    return Session(engine)
 
 
 @pytest.fixture
-def beta(engine, tuesday):
-    with Session(engine, expire_on_commit=False) as session:
-        person = Person(name="Beta", email="beta@example.io", created_at=tuesday)
-        session.add(person)
-        session.commit()
-        return person
+def alpha(session, monday):
+    person = Person(name="Alpha", email="alpha@example.io", created_at=monday)
+    session.add(person)
+    session.commit()
+    return person
 
 
 @pytest.fixture
-def studying(engine, monday):
-    with Session(engine, expire_on_commit=False) as session:
-        term = Term(
-            language="en",
-            term="studying",
-            url="https://wikipedia.org/studying",
-            created_at=monday,
-        )
-        session.add(term)
-        session.commit()
-        return term
+def beta(session, tuesday):
+    person = Person(name="Beta", email="beta@example.io", created_at=tuesday)
+    session.add(person)
+    session.commit()
+    return person
 
 
 @pytest.fixture
-def musing(engine, monday):
-    with Session(engine, expire_on_commit=False) as session:
-        term = Term(
-            language="en",
-            term="musing",
-            url="https://wikipedia.org/musing",
-            created_at=monday,
-        )
-        session.add(term)
-        session.commit()
-        return term
+def studying(session, monday):
+    term = Term(
+        language="en",
+        term="studying",
+        url="https://wikipedia.org/studying",
+        created_at=monday,
+    )
+    session.add(term)
+    session.commit()
+    return term
 
 
 @pytest.fixture
-def coding_1(engine, alpha, studying, musing, monday, tuesday):
-    with Session(engine, expire_on_commit=False) as session:
-        studying = session.query(Term).filter(Term.id == studying.id).one()
-        musing = session.query(Term).filter(Term.id == musing.id).one()
-        lesson = Lesson(language="en", created_at=tuesday)
-        session.add(lesson)
-        session.commit()  # to set lesson.id
-        version = DB.build_lesson_version(
-            session,
-            lesson_id=lesson.id,
-            title="Coding Lesson",
-            url="https://example.io/coding/",
-            abstract="Coding lesson abstract",
-            license="CC-BY",
-            version="1.1",
-            created_at=tuesday,
-        )
-        version.authors.append(alpha)
-        session.add(version)
-        studying.lesson_versions.append(version)
-        musing.lesson_versions.append(version)
-        session.commit()
-        return lesson
+def musing(session, monday):
+    term = Term(
+        language="en",
+        term="musing",
+        url="https://wikipedia.org/musing",
+        created_at=monday,
+    )
+    session.add(term)
+    session.commit()
+    return term
 
 
 @pytest.fixture
-def stats_2(engine, alpha, beta, musing, tuesday, friday):
-    with Session(engine, expire_on_commit=False) as session:
-        lesson = Lesson(language="en", created_at=tuesday)
-        musing = session.query(Term).filter(Term.id == musing.id).one()
-        session.add(lesson)
-        session.commit()  # to set lesson.id
-
-        version_1 = DB.build_lesson_version(
-            session,
-            lesson_id=lesson.id,
-            title="Stats Lesson",
-            url="https://example.io/stats/",
-            abstract="Stats lesson abstract",
-            license="CC-BY",
-            version="1.0",
-            created_at=tuesday,
-        )
-        version_1.authors.append(alpha)
-        version_1.terms.append(musing)
-        session.add(version_1)
-
-        version_2 = DB.build_lesson_version(
-            session,
-            lesson_id=lesson.id,
-            title="Stats Lesson Revised",
-            url="https://example.io/stats/",
-            abstract="Stats lesson abstract revised",
-            license="CC-BY",
-            version="1.1",
-            created_at=friday,
-        )
-        version_2.authors.append(alpha)
-        version_2.authors.append(beta)
-        version_2.terms.append(musing)
-        session.add(version_2)
-        session.commit()
-
-        return lesson
+def coding(session, tuesday):
+    lesson = Lesson(language="en", created_at=tuesday)
+    session.add(lesson)
+    session.commit()
+    return lesson
 
 
 @pytest.fixture
-def client():
-    """Create a client for testing the FastAPI server."""
-    return TestClient(app)
+def coding_v1(session, coding, tuesday, alpha, studying, musing):
+    version = DB.build_lesson_version(
+        session,
+        lesson_id=coding.id,
+        title="Coding Lesson",
+        url="https://example.io/coding/",
+        abstract="Coding lesson abstract",
+        license="CC-BY",
+        version="1.1",
+        created_at=tuesday,
+    )
+    version.authors.append(alpha)
+    session.add(version)
+    studying.lesson_versions.append(version)
+    musing.lesson_versions.append(version)
+    session.commit()
+    return version
+
+
+@pytest.fixture
+def stats(session, tuesday):
+    lesson = Lesson(language="en", created_at=tuesday)
+    session.add(lesson)
+    session.commit()  # to set lesson.id
+    return lesson
+
+
+@pytest.fixture
+def stats_v1(session, stats, tuesday, alpha, musing):
+    version = DB.build_lesson_version(
+        session,
+        lesson_id=stats.id,
+        title="Stats Lesson",
+        url="https://example.io/stats/",
+        abstract="Stats lesson abstract",
+        license="CC-BY",
+        version="1.0",
+        created_at=tuesday,
+    )
+    version.authors.append(alpha)
+    version.terms.append(musing)
+    session.add(version)
+    return version
+
+
+@pytest.fixture
+def stats_v2(session, stats, stats_v1, alpha, beta, friday, musing):
+    version = DB.build_lesson_version(
+        session,
+        lesson_id=stats.id,
+        title="Stats Lesson Revised",
+        url="https://example.io/stats/",
+        abstract="Stats lesson abstract revised",
+        license="CC-BY",
+        version="1.1",
+        created_at=friday,
+    )
+    version.authors.append(alpha)
+    version.authors.append(beta)
+    version.terms.append(musing)
+    session.add(version)
+    session.commit()
+    return version
