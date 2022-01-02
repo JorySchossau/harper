@@ -1,10 +1,8 @@
 """Main server script."""
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
-import harper.workflow as workflow
-from harper.util import HarperExc
 import harper.lesson
 import harper.person
 import harper.term

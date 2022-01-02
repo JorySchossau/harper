@@ -1,5 +1,10 @@
 """Utilities."""
 
+from functools import wraps
+
+from fastapi import HTTPException
+
+
 LANG_ID_LEN = 2
 
 
@@ -18,6 +23,18 @@ class HarperExc(Exception):
         """Construct exception with optional HTTP status code."""
         self.message = message
         self.code = code
+
+
+def harper_exc(original):
+    """Convert Harper exceptions to HTTP exceptions."""
+    # https://stackoverflow.com/questions/64497615/how-to-add-a-custom-decorator-to-a-fastapi-route
+    @wraps(original)
+    async def wrapped(*args, **kwargs):
+        try:
+            return await original(*args, **kwargs)
+        except HarperExc as exc:
+            raise HTTPException(status_code=exc.code, detail=exc.message)
+    return wrapped
 
 
 def author_list(authors):
