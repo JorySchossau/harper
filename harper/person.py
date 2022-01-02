@@ -9,6 +9,15 @@ from harper.util import ErrorMessage, HarperExc, harper_exc
 router = APIRouter()
 
 
+@router.get("/all/")
+@harper_exc
+async def get_all_persons():
+    """List of all people."""
+    with Session(DB.engine) as session:
+        persons = session.query(Person).all()
+        return [{"person_id": p.id, "name": p.name, "email": p.email} for p in persons]
+
+
 @router.get("/{person_id}/")
 @harper_exc
 async def get_person(person_id):

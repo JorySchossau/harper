@@ -81,6 +81,14 @@ def test_get_nonexistent_person(client, engine):
     assert error_match(body["detail"], ErrorMessage.no_such_person)
 
 
+def test_get_all_persons(client, alpha, beta):
+    response = client.get("/person/all/")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 2
+    assert {p["name"] for p in body} == {alpha.name, beta.name}
+
+
 def test_get_all_terms(client, coding_v1, stats_v2):
     response = client.get("/term/all/")
     assert response.status_code == 200

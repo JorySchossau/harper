@@ -44,7 +44,6 @@ reformat:
 ## clean: remove junk files
 .PHONY: clean
 clean:
-	@find . -type d -name __pycache__ -exec rm -rf {} \;
 	@find . -name '*~' -exec rm {} \;
 	@find . -name .DS_Store -exec rm {} \;
-	@rm -rf htmlcov
+	@rm -rf htmlcov */__pycache__ testing.db
