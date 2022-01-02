@@ -16,6 +16,12 @@ serve:
 test:
 	@pytest tests
 
+## coverage: run available tests and report coverage
+.PHONY: coverage
+coverage:
+	@coverage run --branch -m pytest
+	@coverage html
+
 ## docs: build documentation
 .PHONY: docs
 docs:
@@ -38,12 +44,7 @@ reformat:
 ## clean: remove junk files
 .PHONY: clean
 clean:
-	@find . -name '*~' -exec rm {} \; # Emacs backup files
-	@find . -name .DS_Store -exec rm {} \; # Mac preview cache
-	@find . -name '*.pyc' -exec rm {} \; # Python bytecode files
-
-## sterile: remove junk files and other stuff
-.PHONY: sterile
-sterile:
-	@make clean
-	@find . -name __pycache__ -exec rm -rf {} \;
+	@find . -type d -name __pycache__ -exec rm -rf {} \;
+	@find . -name '*~' -exec rm {} \;
+	@find . -name .DS_Store -exec rm {} \;
+	@rm -rf htmlcov

@@ -24,7 +24,6 @@ from harper.util import LANG_ID_LEN, HarperExc
 def timestamp():
     """Return current time."""
     result = datetime.utcnow()
-    print(f"TIMESTAMP RESULT {result}")
     return result
 
 

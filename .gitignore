@@ -1,6 +1,10 @@
 # Emacs backup files
 *~
 
+# Coverage testing
+.coverage
+htmlcov
+
 # Python bytecode files
 *.pyc
 
