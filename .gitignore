@@ -17,5 +17,5 @@ node_modules
 # MkDocs output directory
 site
 
-# Testing database
-testing.db
+# Testing databases
+*.db

@@ -18,6 +18,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import ArgumentError
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.pool import StaticPool
 
@@ -49,19 +50,22 @@ class DB:
     engine = None
 
     @staticmethod
-    def configure(name):
+    def configure(url):
         """Configure the back end."""
-        if name == "sqlite":
-            DB.engine = create_engine(
-                "sqlite://",
-                connect_args={"check_same_thread": False},
-                poolclass=StaticPool,
-            )
-            DB.base.metadata.drop_all(DB.engine)
-            DB.base.metadata.create_all(DB.engine)
+        try:
+            if url == "test":
+                DB.engine = create_engine(
+                    "sqlite://",
+                    connect_args={"check_same_thread": False},
+                    poolclass=StaticPool,
+                )
+                DB.base.metadata.drop_all(DB.engine)
+                DB.base.metadata.create_all(DB.engine)
+            else:
+                DB.engine = create_engine(url)
             return DB.engine
-        else:
-            raise HarperExc(f"Unknown database back-end '{name}'")
+        except ArgumentError:
+            raise HarperExc(f"Unable to connect to {url}", code=500)
 
     @staticmethod
     def get_current_lesson_version(session, lesson_id):

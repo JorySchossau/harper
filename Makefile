@@ -11,6 +11,10 @@ help:
 serve:
 	@python -m harper.server
 
+## reset: create a fresh testing database
+reset:
+	@bin/db_create test.db
+
 ## test: run unit tests
 .PHONY: test
 test:

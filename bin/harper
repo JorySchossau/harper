@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+"""Command-line client for Harper."""
+
+import argparse
+import sys
+from http.client import responses as http_responses
+
+import requests
+
+
+def main(args):
+    parser = arg_parser()
+    config = parser.parse_args(args)
+    check(config.entity is not None, "Must specify entity")
+    check(config.verb is not None, "Must specify verb")
+    url = make_url(config)
+    if config.verb == "create":
+        response = requests.post(url)
+    elif config.verb == "delete":
+        response = requests.delete(url)
+    elif config.verb == "get":
+        response = requests.get(url)
+    elif config.verb == "update":
+        response = requests.put(url)
+    else:
+        fail(f"Unknown verb {config.verb}")
+    print(response.status_code, http_responses[response.status_code], response.json())
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("entity", help="What entity to access.")
+    parser.add_argument("verb", help="What to do.")
+    parser.add_argument("--all", action="store_true", help="Act on everything.")
+    parser.add_argument("--id", help="What to act on.")
+    parser.add_argument("--site", default="http://localhost:80", help="Server address.")
+    return parser
+
+
+def check(cond, msg):
+    if not cond:
+        fail(msg)
+
+
+def fail(msg):
+    print(msg, file=sys.stderr)
+    sys.exit(1)
+
+
+def make_url(config):
+    if config.all:
+        return f"{config.site}/{config.entity}/all/"
+    check(config.id, "ID required")
+    return f"{config.site}/{config.entity}/{config.id}/"
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
