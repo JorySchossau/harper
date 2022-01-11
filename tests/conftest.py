@@ -37,7 +37,7 @@ def friday():
 @pytest.fixture
 def engine():
     """Re-initialize the database."""
-    return DB.configure("sqlite")
+    return DB.configure("test")
 
 
 @pytest.fixture
